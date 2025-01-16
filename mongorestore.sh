@@ -1,1 +1,1 @@
-mongorestore --db old_asset_manager --drop ./backup/cmdb
+mongorestore --db old_asset_manager --drop ./cmdb

@@ -1,3 +1,4 @@
+import json
 from typing import List
 from models.dynamic_document import GenericDocument
 from models.framework_types import FrameworkTypesDocument
@@ -16,7 +17,8 @@ class MigrationAssetManagerSchemas:
             value[field.name] = field.value
 
         return value
-    
+
+        
     def save_framework_type(self):
         """"
         This mehtod obtain all the schema types from frameworks.type, this information is related to the table type or collection that we need to complete the migration process
@@ -24,14 +26,18 @@ class MigrationAssetManagerSchemas:
         """
 
         print("Getting all frameworks.type documents ...")
-        total_registered = 0
-        documents = FrameworkTypesDocument.objects.all()
+        
+        documents = FrameworkTypesDocument.objects.only('name', 'fields').all()
 
         for doc in documents:
-            total_registered += 1
-            self.framework_types[doc.public_id] = doc
 
-        print(f"Total frameworks.type documents registered: {len(self.framework_types)}")
+            self.framework_types[doc.public_id] = {
+                "doc": doc,
+                "cls": None
+            }
+
+        print(f"Total frameworks.type documents registered: {len(documents)}")
+
 
     def generate_documents(self):
         """
@@ -41,22 +47,33 @@ class MigrationAssetManagerSchemas:
 
         print("Getting all frameworks.objects documents to migrate ...")
         
-        documents = FrameworkObjectsDocument.objects.all()
+        documents = FrameworkObjectsDocument.objects(type_id=4)
         self.documents_collections = documents
 
+        print(f"Total frameworks.objects documents found: {len(documents)}")
        
 
     def save_documents(self):
-         for doc in self.documents_collections:
-            collection = self.framework_types[doc.type_id]
+        success = 0
+        errors = 0
 
-            class DynamicCollection(GenericDocument):
-                meta = {
-                    "collection": collection.name,
-                }
+        for doc in self.documents_collections:
+            try:
+                collection = self.framework_types[doc.type_id]
 
-            value_to_insert = self.build_document(doc.fields)
-            document = DynamicCollection(**value_to_insert)
-            document.save()
+                class DynamicCollection(GenericDocument):
+                    meta = {
+                        "collection": collection.name,
+                        "allow_inheritance": False,
+                    }
 
-            print(f"Document inserted successfully into '{collection.name}'")
+                value_to_insert = self.build_document(doc.fields)
+                document = DynamicCollection(**value_to_insert)
+                document.save()
+
+                success += 1
+            except Exception as error:
+                errors += 1
+
+
+        print(f"Process complete, success: {success} errors: {errors}")

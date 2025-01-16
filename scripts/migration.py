@@ -7,8 +7,6 @@ from scripts.frameworks_types_assets import MigrationAssetManagerSchemas
 def connect_asset_manager(old_version: bool = False):
     database_name = "old_asset_manager" if old_version is True else "asset_manager"
 
-    print("database_name", database_name)
-
     datagerry_connection = DatabaseConnection(
         db_name=database_name,
         host="localhost",
@@ -54,14 +52,17 @@ def migration():
 
     """
 
+    migration_types = []
+
     datagerry_connection = connect_asset_manager(True)
 
     migration_asset_manager = MigrationAssetManagerSchemas()
     migration_asset_manager.save_framework_type()
-
     migration_asset_manager.generate_documents()
 
-    # asset_manager_connection = connect_asset_manager()
+    datagerry_connection.disconnect()
 
+    # asset_manager_connection = connect_asset_manager()
+    # migration_asset_manager.save_documents()
     # asset_manager_connection.disconnect()
 

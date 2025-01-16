@@ -1,5 +1,6 @@
 import mongoengine
 from mongoengine.connection import get_db
+from mongoengine import disconnect
 
 
 class DatabaseConnection:
@@ -44,6 +45,9 @@ class DatabaseConnection:
         if self.connection:
             self.connection.close()
             self.connection = None
+
+            disconnect()
+            
             print(f"Disconnected from MongoDB database: {self.db_name}")
 
     def get_database(self):
