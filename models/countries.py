@@ -3,7 +3,7 @@ from mongoengine import StringField, IntField
 from models.base_document import BaseDocument
 
 
-class CountriesDocument(BaseDocument):
+class CountryDocument(BaseDocument):
     """Model to collection countries."""
 
     country_id = IntField(min_value=0, required=True)

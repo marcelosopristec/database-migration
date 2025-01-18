@@ -29,7 +29,7 @@ class Field(me.EmbeddedDocument):
     default = me.StringField()
     options = me.ListField(me.DictField())
     value = me.DynamicField()
-    ref_types = me.ListField(me.StringField())
+    ref_types = me.ListField(me.IntField())
     summaries = me.ListField(me.DictField())
 
 

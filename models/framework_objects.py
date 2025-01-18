@@ -9,10 +9,12 @@ from mongoengine import (
     ListField
 )
 
-class Field(EmbeddedDocument):
+
+class ObjectField(EmbeddedDocument):
     """Model to represent individual field data."""
     name = StringField(required=True)
     value = StringField()
+
 
 class FrameworkObjectsDocument(Document):
     """Model to represent the document structure."""
@@ -24,7 +26,7 @@ class FrameworkObjectsDocument(Document):
     last_edit_time = DateTimeField(required=True)
     editor_id = IntField(required=True)
     active = BooleanField(required=True)
-    fields = EmbeddedDocumentListField(Field, required=True)
+    fields = EmbeddedDocumentListField(ObjectField, required=True)
     multi_data_sections = ListField(default=[])
     public_id = IntField(required=True)
     views = IntField(default=0)

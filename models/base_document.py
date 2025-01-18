@@ -1,15 +1,21 @@
 from datetime import datetime
-from mongoengine import Document, DateTimeField
+from mongoengine import Document, DateTimeField, IntField
 
 
 class BaseDocument(Document):
-    """Model to collection vendors."""
+    """Base Document with common fields across the other models."""
 
-    creation_time = DateTimeField(required=True, default=datetime.datetime.now)
-    last_update_time = DateTimeField(required=True, default=datetime.datetime.now)
+    creation_time = DateTimeField(required=True, default=datetime.now)
+    last_update_time = DateTimeField(required=True, default=datetime.now)
     deletion_time = DateTimeField()
 
-    meta = {"allow_inheritance": True, "abstract": True}
+    # NOTE: This extra field is used only for the migration of the database, its not needed
+    # after the migration an can be safely removed afterwards, its needed to pass the correct references
+    # to the new instance
+    # WARNING: if this models are used in another project delete this field
+    public_id = IntField(required=True)
+
+    meta = {"abstract": True}
 
     def save(
         self,
@@ -24,7 +30,7 @@ class BaseDocument(Document):
         signal_kwargs=None,
         **kwargs,
     ):
-        self.last_update_time = datetime.datetime.now()
+        self.last_update_time = datetime.now()
         super().save(
             force_insert,
             validate,
@@ -51,7 +57,7 @@ class BaseDocument(Document):
         signal_kwargs=None,
         **kwargs,
     ):
-        self.deletion_time = datetime.datetime.now()
+        self.deletion_time = datetime.now()
         super().save(
             force_insert,
             validate,
