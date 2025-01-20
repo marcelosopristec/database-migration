@@ -1,12 +1,13 @@
 from mongoengine import (
-    Document,
     StringField,
     BooleanField,
     IntField,
 )
 
+from models.base_document import BaseDocument
 
-class CustomerDocument(Document):
+
+class CustomerDocument(BaseDocument):
     """Model to represent the customer document structure."""
     customer_id = IntField(required=True)
     division_id = IntField(required=True)
